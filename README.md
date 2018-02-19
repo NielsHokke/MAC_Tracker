@@ -1,6 +1,6 @@
 # MAC_Tracker
 
-Project for tracking MAC-address using a ESP-32 and wireshark
+Project for tracking MAC-address using an ESP-32 or raspberryPi and wireshark
 
 ## Getting Started
 
@@ -8,31 +8,52 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### Prerequisites
 
+#### ESP-32
+
 * DOIT ESP32 DEVKIT [ebay link](https://www.ebay.com/itm/DOIT-Development-Board-WiFi-Bluetooth-Low-Consumption-Dual-Core-ESP-32-ESP-2018/173061599471?epid=843519115&hash=item284b4670ef:g:BxIAAOSww9xZC~gr)
 * follow [this](http://dagrende.blogspot.nl/2017/01/how-to-use-doit-esp32-devkit.html) to get started with DOIT ESP32 DEVKIT
 * install [ArduinoPcap](https://github.com/spacehuhn/ArduinoPcap) libary from [spacehuhn](https://github.com/spacehuhn)
 
+#### raspberryPi
+
+* raspberry Pi with wifi. Can be raspberryPi3/RaspberryPi Zero W or older Pi with wifi-dongle which supports monitor mode
+* [kali](https://docs.kali.org/kali-on-arm/install-kali-linux-arm-raspberry-pi) or other OS for the pi
+* If not already in OS [wireshark](https://askubuntu.com/questions/700712/how-to-install-wireshark)
+* tshark
+```
+sudo apt-get update
+sudo apt-get install tshark
+```
 
 ### Installing
 
-A step by step series of examples that tell you have to get a development env running
-follow [this guide](https://github.com/espressif/arduino-esp32/tree/master/libraries/SD) to connect SD-card to the DOIT ESP32 DEVKIT
+#### ESP-32
+* Follow [this guide](https://github.com/espressif/arduino-esp32/tree/master/libraries/SD) to connect SD-card to the DOIT ESP32 DEVKIT
+* Install code from arduino folder to the ESP-32
 
-https://www.hackster.io/rayburne/esp8266-mini-sniff-f6b93a
+#### raspberryPi
 
-Say what the step will be
-
+* Install [kali](https://docs.kali.org/kali-on-arm/install-kali-linux-arm-raspberry-pi) or other OS on the pi
+* Install tshark by running:
 ```
-Give the example
+sudo apt-get update
+sudo apt-get install tshark
+```
+* Download MAC_Tracker.py to pi
+* Adjust settings by changing
+```
+interface = "wlan0"
+duration = 300
+file_prefix = "data"
+capture_filter = "not subtype beacon"
+output_dir = "output"
 ```
 
-And repeat
-
+* run python file
 ```
-until finished
+cd /place/of/MAC_Tracker.py
+sudo pyhton MAC_Tracker.py
 ```
-
-End with an example of getting some data out of the system or using it for a little demo
 
 ## Authors
 
