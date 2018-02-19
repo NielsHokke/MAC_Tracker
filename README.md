@@ -55,6 +55,16 @@ cd /place/of/MAC_Tracker.py
 sudo pyhton MAC_Tracker.py
 ```
 
+#### analsysing data
+
+* Download pcap_analiser.py
+* Adjust settings by changing
+```
+path_of_files = "path/to/pcapfiles/"
+```
+* run python file
+
+
 ## Authors
 
 * **Niels Hokke** - *Initial work* - [NielsHokke](https://github.com/NielsHokke)
