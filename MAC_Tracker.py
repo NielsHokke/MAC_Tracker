@@ -6,7 +6,7 @@ from matplotlib.dates import DayLocator, HourLocator, DateFormatter, drange
 import struct
 import numpy as np
 
-file_path = 'smalleroutput3.csv'
+file_path = '3600s.csv'
 
 # 1519302005.708943170	ac:bc:32:c6:da:59	-52
 
@@ -49,7 +49,7 @@ def show_uniqueMacoverTime():
 	x = []
 	Mac_list = []
 
-	timeslot = 10
+	timeslot = 3600
 	lastTime = 0.0
 
 	data = csv.reader(open(file_path), delimiter='\t')
@@ -80,7 +80,7 @@ def show_uniqueMacoverTime():
 	plt.gca().xaxis.set_minor_locator(mdates.MinuteLocator(interval=15))
 	plt.gcf().autofmt_xdate()
 
-	plt.plot(x, y)
+	plt.bar(x, y, width=0.03, align='center')
 	plt.show()
 
 
