@@ -28,7 +28,7 @@ class GuiTracker:
 			if len(MACtionary[MAC]) > 1:
 				for Time in MACtionary[MAC]:
 					self.tree.insert(Parent, "end", MAC + str(Time), text=" " + MAC , values=(" ", Time))
-		self.myContainer.pack() 
+		self.myContainer.pack()
 
 		self.tree.pack(side="left")
 
