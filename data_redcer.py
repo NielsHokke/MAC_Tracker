@@ -1,13 +1,14 @@
 from tkinter import ttk
 import tkinter
 import csv
+import collections
 
-declutter_min = 43200
+declutter_min = 300.0
 declutter_max = 300000.0
 Ignore_Singletons = True
 
 input_file = 'output.csv'
-output_file = 'smalleroutput.csv'
+output_file = '3600s.csv'
 
 class GuiTracker:
 	def __init__(self, myParent, MACtionary):
@@ -40,9 +41,11 @@ class GuiTracker:
 
 macaskey = {}
 
+readlines = 0
 with open(input_file, newline='') as csvfile:
 	spamreader = csv.reader(csvfile, delimiter='\t')
 	for row in spamreader:
+		readlines = readlines + 1
 		if not row[1] in macaskey:
 			macaskey.update({row[1]:[]})
 
@@ -63,7 +66,6 @@ for MAC in macaskey:
 		macstoremove.append(MAC)
 
 for MAC in macstoremove:
-	print("Remove all gay shit")
 	macaskey.pop(MAC)
 
 timeaskey = {}
@@ -72,10 +74,18 @@ for MAC in macaskey:
 		for time in macaskey[MAC]:
 			timeaskey.update({time: MAC})
 
-with open(output_file, 'w') as csv_file:
-	writer = csv.writer(csv_file)
-	for key, value in timeaskey.items():
+
+ordereddict = collections.OrderedDict(sorted(timeaskey.items()))
+
+
+writelines = 0
+with open(output_file, 'w', newline='') as csv_file:
+	writer = csv.writer(csv_file, delimiter='\t')
+	for key, value in ordereddict.items():
+		writelines = writelines + 1
 		writer.writerow([key, value])
+
+print("Reduce from " + str(readlines) + " data points to " + str(writelines) + " lines")
 
 root = tkinter.Tk()
 root.resizable(False, False)
