@@ -48,22 +48,13 @@ def show_MACoverTime():
 	cmap = plt.cm.RdYlGn
 
 	def update_annot(ind):
-		pass
-		# print(ind['ind'][0])
-		# print(Mac_list[ind['ind'][0]])
-		# pos = sc.get_offsets()[ind["ind"][0]]
-		# annot.xy = pos
-		# text = "{}".format(Mac_list[ind['ind'][0]])
-		# annot.set_text(text)
-		# annot.get_bbox_patch().set_facecolor(cmap(norm(c[ind["ind"][0]])))
-		# annot.get_bbox_patch().set_alpha(0.4)
+		ax.set_title(Mac_list[y[ind['ind'][0]]] + "    " + x[ind['ind'][0]].strftime("%d %H:%M:%S"))
 
 	def hover(event):
 		vis = annot.get_visible()
 		if event.inaxes == ax:
 			cont, ind = sc.contains(event)
 			if cont:
-				print(ind)
 				update_annot(ind)
 				annot.set_visible(True)
 				fig.canvas.draw_idle()
