@@ -3,12 +3,12 @@ import tkinter
 import csv
 import collections
 
-declutter_min = 300.0
+declutter_min = 3600.0
 declutter_max = 300000.0
 Ignore_Singletons = True
 
-input_file = 'output.csv'
-output_file = '3600s.csv'
+input_file = 'measurments/dinsdagwoensdagfixed.csv'
+output_file = 'dinsdagwoensdag.csv'
 
 class GuiTracker:
 	def __init__(self, myParent, MACtionary):
