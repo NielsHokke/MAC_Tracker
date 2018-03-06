@@ -5,9 +5,10 @@ import matplotlib.dates as mdates
 import math
 from manuf import manuf
 
-file_path = 'measurments/Output.csv'
+# Script that visualises measured MAC-Tracking data
 
-Special_MAC = {'Niels': '94:65:2d:2d:14:17', 'Jetse': '34:80:b3:f0:30:69', 'Mark': 'c0:ee:fb:92:d6:01'}
+# input date file
+file_path = 'measurments/Output.csv'
 
 
 # function shows MAC occurrences over time in a scatter-plot
@@ -19,6 +20,9 @@ def show_MACoverTime():
 	s = []
 	Mac_list = []
 
+	# list of MAC's to be high lighted
+	Special_MAC = {'Niels': '94:65:2d:2d:14:17', 'Jetse': '34:80:b3:f0:30:69', 'Mark': 'c0:ee:fb:92:d6:01'}
+
 	data = csv.reader(open(file_path), delimiter='	')
 	for row in data:
 		MAC_scr = row[1][0:8]
@@ -27,16 +31,15 @@ def show_MACoverTime():
 			Mac_list.append(MAC_scr)
 
 		x.append(dt.datetime.fromtimestamp(int(float(time_stamp))))
-		# print(MAC_scr)
-		# print()
 		y.append(Mac_list.index(MAC_scr))
 
 		if MAC_scr in Special_MAC.values():
-			s.append(20)  # 75
+			s.append(75)  # 75
 		else:
-			s.append(20)  # 4
+			s.append(4)  # 4
 
-		c.append(((float.fromhex(MAC_scr[-2:]) / 0xff), (float.fromhex(MAC_scr[-5:-3]) / 0xff), (float.fromhex(MAC_scr[-8:-6]) / 0xff)))
+		c.append(((float.fromhex(MAC_scr[-2:]) / 0xff), (float.fromhex(MAC_scr[-5:-3]) / 0xff),
+				  (float.fromhex(MAC_scr[-8:-6]) / 0xff)))
 
 	print(len(Mac_list))
 
@@ -54,6 +57,7 @@ def show_MACoverTime():
 						arrowprops=dict(arrowstyle="->"))
 	annot.set_visible(False)
 
+	# functions used to indicate selected data-point in plot
 	def update_annot(ind):
 		ax.set_title(Mac_list[y[ind['ind'][0]]] + "    " + x[ind['ind'][0]].strftime("%d %H:%M:%S"))
 
@@ -69,17 +73,19 @@ def show_MACoverTime():
 				if vis:
 					annot.set_visible(False)
 					fig.canvas.draw_idle()
-	#
+
 	fig.canvas.mpl_connect("motion_notify_event", hover)
 
 	plt.show()
 
+
 # function shows a pie chard of vendor types
 def show_vendors():
+	other = 0.032  # percentage threshold of being put under 'Others'
+
 	sizes = {}
 	vendors = {}
 	total = 0
-	other = 0.032
 
 	data = csv.reader(open(file_path), delimiter='	')
 	for row in data:
@@ -98,30 +104,27 @@ def show_vendors():
 		else:
 			vendors[vendor] = value
 
-	vendors2 = {}
-	vendors2["other"] = 0
+	vendors2 = {"other": 0}
 	for key, value in vendors.items():
 
-		if value < total*other:
+		if value < total * other:
 			vendors2["other"] += value
 		else:
 			vendors2[key] = value
 
-
-	print(len(sizes.values()))
-
 	plt.pie(vendors2.values(), labels=vendors2.keys(), autopct='%1.1f%%', shadow=True, startangle=140)
 	plt.show()
 
+
 # function shows the number of unique MAC occurrences per timeslot in a bar-graph
 def show_uniqueMacoverTime():
+	timeslot = 1800  # size of timeslot in seconds
+
+	lastHour = 0.0
+	lastTime = 0.
 	y = []
 	x = []
 	Mac_list = []
-
-	timeslot = 1800
-	lastHour = 0.0
-	lastTime = 0.0
 
 	data = csv.reader(open(file_path), delimiter='\t')
 	for row in data:
@@ -140,11 +143,9 @@ def show_uniqueMacoverTime():
 		if MAC_scr not in Mac_list:
 			Mac_list.append(MAC_scr)
 
-	# print(y)
-
 	fig, ax = plt.subplots()
 
-	plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%a %d %H:%M:%S')) #
+	plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%a %d %H:%M:%S'))  #
 	ax.set_xlim([min(x) - dt.timedelta(hours=1), max(x) + dt.timedelta(hours=1)])
 	plt.gca().xaxis.set_major_locator(mdates.HourLocator(interval=4))
 	plt.gca().xaxis.set_minor_locator(mdates.MinuteLocator(interval=30))
@@ -153,13 +154,14 @@ def show_uniqueMacoverTime():
 	plt.bar(x, y, width=0.019)  # , align='center'
 	plt.show()
 
+
 # function shows the number of unique MAC occurrences per timeslot in a bar-graph averaged over multple days
 def show_uniqueMacoverTimeOneDay():
+	timeslot = 1800  # size of timeslot in seconds
+
 	y = []
 	x = []
 	Mac_list = []
-
-	timeslot = 1800
 	lastTime = 0.0
 
 	data = csv.reader(open(file_path), delimiter='\t')
@@ -179,13 +181,14 @@ def show_uniqueMacoverTimeOneDay():
 		if MAC_scr not in Mac_list:
 			Mac_list.append(MAC_scr)
 
-	x2 = [dt.datetime(2018, 2, 27, 0, 0, 0) + dt.timedelta(seconds=timeslot*x) for x in range(0, int(86400/timeslot))]
-	y2 = [0]*int(86400/timeslot)
+	x2 = [dt.datetime(2018, 2, 27, 0, 0, 0) + dt.timedelta(seconds=timeslot * x) for x in
+		  range(0, int(86400 / timeslot))]
+	y2 = [0] * int(86400 / timeslot)
 	for date, count in zip(x, y):
 		if 1520031660 < date.timestamp() < 1520115839:
 			hour = date.hour
 			minute = date.minute
-			index = int(hour*(3600/timeslot) + math.floor(minute*(60/timeslot)))
+			index = int(hour * (3600 / timeslot) + math.floor(minute * (60 / timeslot)))
 			y2[index] += count
 
 	fig, ax = plt.subplots()
@@ -201,10 +204,11 @@ def show_uniqueMacoverTimeOneDay():
 	plt.show()
 
 
-
 print("started")
+
+# select function to use
+
 show_MACoverTime()
 # show_vendors()
 # show_uniqueMacoverTime()
 # show_uniqueMacoverTimeOneDay()
-

@@ -2,6 +2,10 @@
 
 Project for tracking MAC-address using an ESP-32 or raspberryPi and wireshark
 
+## Paper with results
+[MAC-based activity tracking using passive sniffing](https://github.com/NielsHokke/MAC_Tracker/blob/master/MAC-based%20activity%20tracking%20using%20passive%20sniffing.pdf)
+
+
 ## Getting Started
 
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
@@ -39,40 +43,23 @@ sudo apt-get install tshark
 sudo apt-get update
 sudo apt-get install tshark
 ```
-* Download MAC_Tracker.py to pi
-* Adjust settings by changing
-```
-interface = "wlan0"
-duration = 300
-file_prefix = "data"
-capture_filter = "not subtype beacon"
-output_dir = "output"
-```
-
+* Download raspberryPi/mac_tracker.sh to pi
 * run python file
 ```
-cd /place/of/MAC_Tracker.py
-sudo pyhton MAC_Tracker.py
+cd /place/of/mac_tracker/
+./mac_tracker.sh
 ```
 
 #### analsysing data
 
-* Download pcap_analiser.py
-* Adjust settings by changing
-```
-path_of_files = "path/to/pcapfiles/"
-```
-* run python file
-
+* Download pre_processor.py and MAC_Visualiser.py
+* Adjust filters of pre_processor and run
+* Adjust settings of MAC_Visualiser and run
 
 ## Authors
 
-* **Niels Hokke** - *Initial work* - [NielsHokke](https://github.com/NielsHokke)
-* **Jetse Brouwer** - *Initial work* - [JetseBrouwer](https://github.com/JetseBrouwer)
+* **Niels Hokke** - [NielsHokke](https://github.com/NielsHokke)
+* **Jetse Brouwer** - [JetseBrouwer](https://github.com/JetseBrouwer)
 
 
-## Acknowledgments
 
-* Hat tip to anyone who's code was used
-* Inspiration
-* etc
