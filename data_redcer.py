@@ -24,8 +24,8 @@ Special_MAC = {'Niels': '94:65:2d:2d:14:17',
 			   'rand7': '84:7a:88:51:3a:ff',
 			   'rand8': '40:98:ad:14:bc:06'}
 
-input_file = 'total_sorted_reduced.csv'
-output_file = 'total_reduced_selected.csv'
+input_file = 'measurments/Total.csv'
+output_file = 'measurments/Output.csv'
 
 class GuiTracker:
 	def __init__(self, myParent, MACtionary):

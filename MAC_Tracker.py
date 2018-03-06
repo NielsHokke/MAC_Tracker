@@ -1,12 +1,11 @@
 import csv
 import matplotlib.pyplot as plt
-import matplotlib.ticker as tck
 import datetime as dt
 import matplotlib.dates as mdates
 import math
 from manuf import manuf
 
-file_path = 'total_reduced_selected.csv'
+file_path = 'measurments/Output.csv'
 
 Special_MAC = {'Niels': '94:65:2d:2d:14:17', 'Jetse': '34:80:b3:f0:30:69', 'Mark': 'c0:ee:fb:92:d6:01'}
 
