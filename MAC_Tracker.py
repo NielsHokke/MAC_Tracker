@@ -1,19 +1,19 @@
 import csv
 import matplotlib.pyplot as plt
+import matplotlib.ticker as tck
 import datetime as dt
 import matplotlib.dates as mdates
-from matplotlib.dates import DayLocator, HourLocator, DateFormatter, drange
-import struct
-import numpy as np
+import math
 
-file_path = 'measurments/dinsdagwoensdagfixed.csv'
+file_path = 'Macovertime.csv'
 
-# 1519302005.708943170	ac:bc:32:c6:da:59	-52
+Special_MAC = {'Niels': '94:65:2d:2d:14:17', 'Jetse': '34:80:b3:f0:30:69', 'Mark': 'c0:ee:fb:92:d6:01'}
 
 def show_MACoverTime():
 	x = []
 	y = []
 	c = []
+	s = []
 	Mac_list = []
 
 	data = csv.reader(open(file_path), delimiter='	')
@@ -28,24 +28,28 @@ def show_MACoverTime():
 		# print()
 		y.append(Mac_list.index(MAC_scr))
 
+		if MAC_scr in Special_MAC.values():
+			s.append(4) # 75
+		else:
+			s.append(0)
+
 		c.append(((float.fromhex(MAC_scr[-2:]) / 0xff), (float.fromhex(MAC_scr[-5:-3]) / 0xff), (float.fromhex(MAC_scr[-8:-6]) / 0xff)))
+
+	print(len(Mac_list))
 
 	fig, ax = plt.subplots()
 
-	plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%d %H:%M:%S'))
+	plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%a %d %H:%M:%S'))
 	ax.set_xlim([min(x) - dt.timedelta(hours=1), max(x) + dt.timedelta(hours=1)])
-	plt.gca().xaxis.set_major_locator(mdates.HourLocator(interval=2))
-	plt.gca().xaxis.set_minor_locator(mdates.MinuteLocator(interval=15))
-	sc = plt.scatter(x, y, c=c)
+	plt.gca().xaxis.set_major_locator(mdates.HourLocator(interval=6))
+	plt.gca().xaxis.set_minor_locator(mdates.MinuteLocator(interval=60))
+	sc = plt.scatter(x, y, c=c, s=s)
 	plt.gcf().autofmt_xdate()
 
 	annot = ax.annotate("", xy=(0, 0), xytext=(20, 20), textcoords="offset points",
 						bbox=dict(boxstyle="round", fc="w"),
 						arrowprops=dict(arrowstyle="->"))
 	annot.set_visible(False)
-
-	norm = plt.Normalize(1, 4)
-	cmap = plt.cm.RdYlGn
 
 	def update_annot(ind):
 		ax.set_title(Mac_list[y[ind['ind'][0]]] + "    " + x[ind['ind'][0]].strftime("%d %H:%M:%S"))
@@ -65,9 +69,6 @@ def show_MACoverTime():
 	#
 	fig.canvas.mpl_connect("motion_notify_event", hover)
 
-	print(min(x))
-	print(max(x))
-	# plt.xticks(np.arange(0, 5, 1))
 	plt.show()
 
 
@@ -79,21 +80,22 @@ def show_uniqueMacoverTime():
 	Mac_list = []
 
 	timeslot = 1800
+	lastHour = 0.0
 	lastTime = 0.0
 
 	data = csv.reader(open(file_path), delimiter='\t')
 	for row in data:
 		MAC_scr = row[1]
-		time_stamp = row[0]
+		time_stamp = int(float(row[0]))
 
-		if lastTime == 0:
-			lastTime = float(time_stamp)
+		if lastTime == 0.0:
+			lastTime = time_stamp - (time_stamp % timeslot)
 
-		if float(time_stamp) > lastTime + timeslot:
+		if time_stamp > lastTime + timeslot:
+			x.append(dt.datetime.fromtimestamp(int(float(lastTime))))
 			y.append(len(Mac_list))
-			x.append(dt.datetime.fromtimestamp(int(float(time_stamp))))
 			Mac_list = []
-			lastTime = float(time_stamp)
+			lastTime = lastTime + timeslot
 
 		if MAC_scr not in Mac_list:
 			Mac_list.append(MAC_scr)
@@ -102,16 +104,64 @@ def show_uniqueMacoverTime():
 
 	fig, ax = plt.subplots()
 
-	plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%a %d %H:%M:%S'))
+	plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%a %d %H:%M:%S')) #
 	ax.set_xlim([min(x) - dt.timedelta(hours=1), max(x) + dt.timedelta(hours=1)])
-	plt.gca().xaxis.set_major_locator(mdates.HourLocator(interval=2))
-	plt.gca().xaxis.set_minor_locator(mdates.MinuteLocator(interval=15))
+	plt.gca().xaxis.set_major_locator(mdates.HourLocator(interval=4))
+	plt.gca().xaxis.set_minor_locator(mdates.MinuteLocator(interval=30))
 	plt.gcf().autofmt_xdate()
 
-	plt.bar(x, y, width=0.025)  # , align='center'
+	plt.bar(x, y, width=0.019)  # , align='center'
 	# plt.plot(x, y)
 	plt.show()
 
+def show_uniqueMacoverTimeOneDay():
+	y = []
+	x = []
+	Mac_list = []
 
-# show_MACoverTime()
-show_uniqueMacoverTime()
+	timeslot = 1800
+	lastTime = 0.0
+
+	data = csv.reader(open(file_path), delimiter='\t')
+	for row in data:
+		MAC_scr = row[1]
+		time_stamp = int(float(row[0]))
+
+		if lastTime == 0.0:
+			lastTime = time_stamp - (time_stamp % timeslot)
+
+		if time_stamp > lastTime + timeslot:
+			x.append(dt.datetime.fromtimestamp(int(float(lastTime))))
+			y.append(len(Mac_list))
+			Mac_list = []
+			lastTime = lastTime + timeslot
+
+		if MAC_scr not in Mac_list:
+			Mac_list.append(MAC_scr)
+
+	x2 = [dt.datetime(2018, 2, 27, 0, 0, 0) + dt.timedelta(seconds=timeslot*x) for x in range(0, int(86400/timeslot))]
+	y2 = [0]*int(86400/timeslot)
+	for date, count in zip(x, y):
+		if 1520031660 < date.timestamp() < 1520115839:
+			hour = date.hour
+			minute = date.minute
+			index = int(hour*(3600/timeslot) + math.floor(minute*(60/timeslot)))
+			y2[index] += count
+
+	fig, ax = plt.subplots()
+
+	plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
+	ax.set_xlim([min(x2) - dt.timedelta(hours=0), max(x2) + dt.timedelta(hours=0.5)])
+	plt.gca().xaxis.set_major_locator(mdates.HourLocator(interval=2))
+	plt.gca().xaxis.set_minor_locator(mdates.MinuteLocator(interval=30))
+	plt.gcf().autofmt_xdate()
+
+	plt.bar(x2, y2, width=0.018, align='edge')  # , align='center'
+	# plt.plot(x, y)
+	plt.show()
+
+print("started")
+show_MACoverTime()
+# show_uniqueMacoverTime()
+# show_uniqueMacoverTimeOneDay()
+
