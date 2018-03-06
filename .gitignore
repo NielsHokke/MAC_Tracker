@@ -100,4 +100,4 @@ ENV/
 # mypy
 .mypy_cache/
 /data_00121_20180218103151.pcap
-*.csv
+
