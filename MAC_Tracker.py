@@ -4,11 +4,15 @@ import matplotlib.ticker as tck
 import datetime as dt
 import matplotlib.dates as mdates
 import math
+from manuf import manuf
 
-file_path = 'Macovertime.csv'
+file_path = 'total_reduced_selected.csv'
 
 Special_MAC = {'Niels': '94:65:2d:2d:14:17', 'Jetse': '34:80:b3:f0:30:69', 'Mark': 'c0:ee:fb:92:d6:01'}
 
+
+# function shows MAC occurrences over time in a scatter-plot
+# giving each unique MAC address a unique color
 def show_MACoverTime():
 	x = []
 	y = []
@@ -18,7 +22,7 @@ def show_MACoverTime():
 
 	data = csv.reader(open(file_path), delimiter='	')
 	for row in data:
-		MAC_scr = row[1]
+		MAC_scr = row[1][0:8]
 		time_stamp = row[0]
 		if MAC_scr not in Mac_list:
 			Mac_list.append(MAC_scr)
@@ -29,9 +33,9 @@ def show_MACoverTime():
 		y.append(Mac_list.index(MAC_scr))
 
 		if MAC_scr in Special_MAC.values():
-			s.append(4) # 75
+			s.append(20)  # 75
 		else:
-			s.append(0)
+			s.append(20)  # 4
 
 		c.append(((float.fromhex(MAC_scr[-2:]) / 0xff), (float.fromhex(MAC_scr[-5:-3]) / 0xff), (float.fromhex(MAC_scr[-8:-6]) / 0xff)))
 
@@ -41,7 +45,7 @@ def show_MACoverTime():
 
 	plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%a %d %H:%M:%S'))
 	ax.set_xlim([min(x) - dt.timedelta(hours=1), max(x) + dt.timedelta(hours=1)])
-	plt.gca().xaxis.set_major_locator(mdates.HourLocator(interval=6))
+	plt.gca().xaxis.set_major_locator(mdates.HourLocator(interval=8))
 	plt.gca().xaxis.set_minor_locator(mdates.MinuteLocator(interval=60))
 	sc = plt.scatter(x, y, c=c, s=s)
 	plt.gcf().autofmt_xdate()
@@ -71,9 +75,46 @@ def show_MACoverTime():
 
 	plt.show()
 
+# function shows a pie chard of vendor types
+def show_vendors():
+	sizes = {}
+	vendors = {}
+	total = 0
+	other = 0.032
+
+	data = csv.reader(open(file_path), delimiter='	')
+	for row in data:
+		MAC_scr = row[1][0:8]
+		if MAC_scr in sizes:
+			sizes[MAC_scr] += 1
+		else:
+			sizes[MAC_scr] = 1
+		total += 1
+
+	p = manuf.MacParser(update=True)
+	for key, value in sizes.items():
+		vendor = p.get_manuf(key + ':00:00:00')
+		if vendor in vendors:
+			vendors[vendor] += value
+		else:
+			vendors[vendor] = value
+
+	vendors2 = {}
+	vendors2["other"] = 0
+	for key, value in vendors.items():
+
+		if value < total*other:
+			vendors2["other"] += value
+		else:
+			vendors2[key] = value
 
 
+	print(len(sizes.values()))
 
+	plt.pie(vendors2.values(), labels=vendors2.keys(), autopct='%1.1f%%', shadow=True, startangle=140)
+	plt.show()
+
+# function shows the number of unique MAC occurrences per timeslot in a bar-graph
 def show_uniqueMacoverTime():
 	y = []
 	x = []
@@ -111,9 +152,9 @@ def show_uniqueMacoverTime():
 	plt.gcf().autofmt_xdate()
 
 	plt.bar(x, y, width=0.019)  # , align='center'
-	# plt.plot(x, y)
 	plt.show()
 
+# function shows the number of unique MAC occurrences per timeslot in a bar-graph averaged over multple days
 def show_uniqueMacoverTimeOneDay():
 	y = []
 	x = []
@@ -160,8 +201,11 @@ def show_uniqueMacoverTimeOneDay():
 	# plt.plot(x, y)
 	plt.show()
 
+
+
 print("started")
 show_MACoverTime()
+# show_vendors()
 # show_uniqueMacoverTime()
 # show_uniqueMacoverTimeOneDay()
 

@@ -6,15 +6,26 @@ import datetime
 
 declutter_min = 0.0
 declutter_max = 300000.0
+min_occurence = 0
+max_occurence = 89999
 Ignore_Singletons = True
+
 starts_with = "94:65:2d:2d:14:17"
 
-# Mark's Mac "c0:ee:fb:92:d6:01"
-# Jetse's Mac "34:80:b3:f0:30:69"
-# Niels Mac "94:65:2d:2d:14:17"
+useMAClist = True
+Special_MAC = {'Niels': '94:65:2d:2d:14:17',
+			   'Jetse': '34:80:b3:f0:30:69',
+			   'rand1': '9c:f4:8e:17:4c:bd',
+			   'rand2': 'da:a1:19:3d:cb:7f',
+			   'rand3': 'da:a1:19:4e:6e:59',
+			   'rand4': '8c:f5:a3:ec:ec:17',
+			   'rand5': 'cc:61:e5:c7:48:2a',
+			   'rand6': '84:8e:df:f2:b5:d1',
+			   'rand7': '84:7a:88:51:3a:ff',
+			   'rand8': '40:98:ad:14:bc:06'}
 
-input_file = 'measurments/dinsdagwoensdagfixed.csv'
-output_file = 'dinsdagwoensdag.csv'
+input_file = 'total_sorted_reduced.csv'
+output_file = 'total_reduced_selected.csv'
 
 class GuiTracker:
 	def __init__(self, myParent, MACtionary):
@@ -51,7 +62,7 @@ readlines = 0
 with open(input_file, newline='') as csvfile:
 	spamreader = csv.reader(csvfile, delimiter='\t')
 	for row in spamreader:
-		if row[1].endswith(starts_with):
+		if row[1] in Special_MAC.values() or not useMAClist:
 			readlines = readlines + 1
 			if not row[1] in macaskey:
 				macaskey.update({row[1]:[]})
@@ -69,7 +80,7 @@ for MAC in macaskey:
 
 	if len(macaskey[MAC]) == 2 and ((macaskey[MAC][1] - macaskey[MAC][0]) < declutter_min):  # and Ignore_Singletons:
 		macaskey[MAC].pop()
-	if len(macaskey[MAC])== 1 and Ignore_Singletons:
+	if (len(macaskey[MAC])== 1 and Ignore_Singletons) or len(macaskey[MAC]) < min_occurence or len(macaskey[MAC]) > max_occurence:
 		macstoremove.append(MAC)
 
 for MAC in macstoremove:
