@@ -4,15 +4,15 @@ import csv
 import collections
 import datetime
 
-declutter_min = 0.0
-declutter_max = 300000.0
-min_occurence = 0
-max_occurence = 89999
-Ignore_Singletons = True
+declutter_min = 600         # The minimum amount of seconds an MAC must have been away to be able to be registered again
+declutter_max = 300000.0    # If a MAC is continuously deleted because of above plot a point every X seconds
+min_occurence = 0           # Only output Mac entries that have been seen more than this number
+max_occurence = 9999999       # ONly output mac entries that have been seen less than this number
+Ignore_Singletons = True    # if True Mac addresses that only appear once are deleted from the results
 
 starts_with = "94:65:2d:2d:14:17"
 
-useMAClist = True
+useMAClist = False           # If enabled only MAC addresses from the list on the next line will be outputted
 Special_MAC = {'Niels': '94:65:2d:2d:14:17',
 			   'Jetse': '34:80:b3:f0:30:69',
 			   'rand1': '9c:f4:8e:17:4c:bd',
@@ -27,6 +27,8 @@ Special_MAC = {'Niels': '94:65:2d:2d:14:17',
 input_file = 'measurments/Total.csv'
 output_file = 'measurments/Output.csv'
 
+
+#GUI for creating a tree view of all the entries, their occurences and the last time they're seen
 class GuiTracker:
 	def __init__(self, myParent, MACtionary):
 
@@ -42,7 +44,7 @@ class GuiTracker:
 
 		for MAC in MACtionary:
 			# print(MAC, len(MACtionary[MAC]))
-			Parent = self.tree.insert("", "end", text=MAC, values=(len(MACtionary[MAC]), MACtionary[MAC][-1]))
+			Parent = self.tree.insert("", "end", text=MAC, values=(len(MACtionary[MAC]), datetime.datetime.fromtimestamp(int(MACtionary[MAC][-1])).strftime('%Y-%m-%d %H:%M:%S')))
 			if len(MACtionary[MAC]) > 1:
 				for Time in MACtionary[MAC]:
 					self.tree.insert(Parent, "end", MAC + str(Time), text=" " + MAC , values=(" ", datetime.datetime.fromtimestamp(int(Time)).strftime('%Y-%m-%d %H:%M:%S')))
@@ -58,6 +60,7 @@ class GuiTracker:
 
 macaskey = {}
 
+# Read the CSV file and create a dict with the mac as key's to quickly
 readlines = 0
 with open(input_file, newline='') as csvfile:
 	spamreader = csv.reader(csvfile, delimiter='\t')
@@ -75,9 +78,9 @@ with open(input_file, newline='') as csvfile:
 			else:
 				macaskey[row[1]].append(float(row[0]))
 
+
 macstoremove= []
 for MAC in macaskey:
-
 	if len(macaskey[MAC]) == 2 and ((macaskey[MAC][1] - macaskey[MAC][0]) < declutter_min):  # and Ignore_Singletons:
 		macaskey[MAC].pop()
 	if (len(macaskey[MAC])== 1 and Ignore_Singletons) or len(macaskey[MAC]) < min_occurence or len(macaskey[MAC]) > max_occurence:
@@ -86,16 +89,16 @@ for MAC in macaskey:
 for MAC in macstoremove:
 	macaskey.pop(MAC)
 
+# Helper dict to easily sort entries on arrival time before outputting
 timeaskey = {}
 for MAC in macaskey:
 	if not (len(macaskey[MAC]) <= 1 and Ignore_Singletons):
 		for time in macaskey[MAC]:
 			timeaskey.update({time: MAC})
 
-
 ordereddict = collections.OrderedDict(sorted(timeaskey.items()))
 
-
+# CSV write
 writelines = 0
 with open(output_file, 'w', newline='') as csv_file:
 	writer = csv.writer(csv_file, delimiter='\t')
@@ -105,6 +108,7 @@ with open(output_file, 'w', newline='') as csv_file:
 
 print("Reduce from " + str(readlines) + " data points to " + str(writelines) + " lines")
 
+# Display the interface
 root = tkinter.Tk()
 root.resizable(False, False)
 application = GuiTracker(root, macaskey)
