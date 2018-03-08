@@ -4,7 +4,7 @@ import csv
 import collections
 import datetime
 
-declutter_min = 600         # The minimum amount of seconds an MAC must have been away to be able to be registered again
+declutter_min = 0.0         # The minimum amount of seconds an MAC must have been away to be able to be registered again
 declutter_max = 300000.0    # If a MAC is continuously deleted because of above plot a point every X seconds
 min_occurence = 0           # Only output Mac entries that have been seen more than this number
 max_occurence = 9999999       # ONly output mac entries that have been seen less than this number
@@ -12,17 +12,17 @@ Ignore_Singletons = True    # if True Mac addresses that only appear once are de
 
 starts_with = "94:65:2d:2d:14:17"
 
-useMAClist = False           # If enabled only MAC addresses from the list on the next line will be outputted
+useMAClist = True           # If enabled only MAC addresses from the list on the next line will be outputted
 Special_MAC = {'Niels': '94:65:2d:2d:14:17',
 			   'Jetse': '34:80:b3:f0:30:69',
 			   'rand1': '9c:f4:8e:17:4c:bd',
-			   'rand2': 'da:a1:19:3d:cb:7f',
-			   'rand3': 'da:a1:19:4e:6e:59',
-			   'rand4': '8c:f5:a3:ec:ec:17',
-			   'rand5': 'cc:61:e5:c7:48:2a',
-			   'rand6': '84:8e:df:f2:b5:d1',
-			   'rand7': '84:7a:88:51:3a:ff',
-			   'rand8': '40:98:ad:14:bc:06'}
+			   'rand2': '1',
+			   'rand3': '1',
+			   'rand4': '1',
+			   'rand5': '1',
+			   'rand6': '1',
+			   'rand7': '1',
+			   'rand8': '1'}
 
 input_file = 'measurments/Total.csv'
 output_file = 'measurments/Output.csv'
@@ -65,8 +65,10 @@ readlines = 0
 with open(input_file, newline='') as csvfile:
 	spamreader = csv.reader(csvfile, delimiter='\t')
 	for row in spamreader:
+		readlines = readlines + 1
+		if float(row[0]) < 1519711200:
+			continue
 		if row[1] in Special_MAC.values() or not useMAClist:
-			readlines = readlines + 1
 			if not row[1] in macaskey:
 				macaskey.update({row[1]:[]})
 
@@ -109,10 +111,10 @@ with open(output_file, 'w', newline='') as csv_file:
 print("Reduce from " + str(readlines) + " data points to " + str(writelines) + " lines")
 
 # Display the interface
-root = tkinter.Tk()
-root.resizable(False, False)
-application = GuiTracker(root, macaskey)
-
-root.mainloop()
+# root = tkinter.Tk()
+# root.resizable(False, False)
+# application = GuiTracker(root, macaskey)
+#
+# root.mainloop()
 
 

@@ -25,7 +25,7 @@ def show_MACoverTime():
 
 	data = csv.reader(open(file_path), delimiter='	')
 	for row in data:
-		MAC_scr = row[1][0:8]
+		MAC_scr = row[1]
 		time_stamp = row[0]
 		if MAC_scr not in Mac_list:
 			Mac_list.append(MAC_scr)
@@ -34,11 +34,12 @@ def show_MACoverTime():
 		y.append(Mac_list.index(MAC_scr))
 
 		if MAC_scr in Special_MAC.values():
-			s.append(75)  # 75
+			s.append(20)  # 75
 		else:
-			s.append(4)  # 4
+			s.append(20)  # 4
 
-		c.append(((float.fromhex(MAC_scr[-2:]) / 0xff), (float.fromhex(MAC_scr[-5:-3]) / 0xff),
+		c.append(((float.fromhex(MAC_scr[-2:]) / 0xff),
+				  (float.fromhex(MAC_scr[-5:-3]) / 0xff),
 				  (float.fromhex(MAC_scr[-8:-6]) / 0xff)))
 
 	print(len(Mac_list))
