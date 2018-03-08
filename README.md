@@ -4,6 +4,7 @@ Project for tracking MAC-address using an ESP-32 or raspberryPi and wireshark
 
 ## Paper with results
 [MAC-based activity tracking using passive sniffing](https://github.com/NielsHokke/MAC_Tracker/blob/master/MAC-based%20activity%20tracking%20using%20passive%20sniffing.pdf)
+[presentation](https://github.com/NielsHokke/MAC_Tracker/blob/master/presentation.pdf)
 
 
 ## Getting Started
